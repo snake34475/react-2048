@@ -11,9 +11,14 @@ const initArrAll = [
     [0, 0, 0, 0],
     [0, 0, 0, 0]
 ]
+const initGameInfo={
+    source:0,
+    historyTopSource:0,
+}
 export default function Home() {
 
-    const [arrAll, setArrAll] = useState(initArrAll)
+    const [arrAll, setArrAll] = useState(_.cloneDeep(initArrAll))
+    const [gameInfo,setGameInfo] = useState(initGameInfo)
     useEffect(() => {
         // console.log("arrAll", arrAll)
         window.addEventListener("keydown", handleKeyDown)
@@ -24,9 +29,22 @@ export default function Home() {
 
     useEffect(() => {
         initArr()
+        initGameInfoFn()
         // const vConsole = new VConsole();
     }, [])
 
+    const initGameInfoFn=()=>{
+        setGameInfo({
+            source:0,
+            historyTopSource:localStorage.getItem("historyTopSource")||0,
+        })
+    }
+    //重新开始
+    const resetGame=()=>{
+        initGameInfoFn()
+        setArrAll(initArrAll)
+        initArr(initArrAll)
+    }
     //键盘控制
     const handleKeyDown = (e) => {
         //右边
@@ -78,13 +96,13 @@ export default function Home() {
         }
     }
 
-    //初始化坐标
-    const initArr = () => {
+    //初始化两个坐标,随机生成两个
+    const initArr = (arr=arrAll) => {
         const x1 = Math.floor(Math.random() * 4)
         const y1 = Math.floor(Math.random() * 4)
         const x2 = Math.floor(Math.random() * 4)
         const y2 = Math.floor(Math.random() * 4)
-        let _arrAll = _.cloneDeep(arrAll)
+        let _arrAll = _.cloneDeep(arr)
         _arrAll[x1][y1] = 2
         _arrAll[x2][y2] = 2
         setArrAll(_arrAll)
@@ -99,6 +117,22 @@ export default function Home() {
                 if (_arr[i] === _arr[i + 1]) {
                     _arr[i] = _arr[i] * 2
                     _arr[i + 1] = 0
+                    //更新分数和最大值
+                    const source = gameInfo.source+_arr[i]
+                    const historyTopSource=gameInfo.historyTopSource
+                    if(source<=historyTopSource){
+                        setGameInfo({
+                            ...gameInfo,
+                            source,
+                        })
+                    }else{
+                        setGameInfo({
+                            ...gameInfo,
+                            source,
+                            historyTopSource: source
+                        })
+                    }
+                    localStorage.setItem("historyTopSource",source)
                 }
             }
             _arr = _arr.filter(item => item !== 0)
@@ -166,30 +200,28 @@ export default function Home() {
     }
     return (
         <main className='text-center'>
-            <div className='grid grid-row-2 grid-flow-col gap-4'>
-                <div className='basis-4/12 border rounded-2xl'>
+            <div className='grid grid-row-3 grid-cols-3 gap-4'>
+                <div className='row-span-3 grid-cols-1 border rounded-2xl'>
                     <h2>2048</h2>
                     <h3>4*4</h3>
                 </div>
-                <div className='basis-6/12 grid grid-rows-2 '>
-                    <div className='grid grid-rows-2'>
-                        <div className='w-1/2 h-16 border rounded-2xl'>分数</div>
-                        <div className='w-1/2 h-16s border rounded-2xl'>最高分</div>
-                    </div>
-                    <div className='flex flex-row'>
-                        <div className='w-1/2 border rounded-2xl'>重新开始</div>
-                        <div className='w-1/2 border rounded-2xl'>返回菜单</div>
-                    </div>
-
+                <div className='row-span-2 col-span-1  border rounded-2xl'>
+                    <p>分数</p>
+                    <p>{gameInfo?.source}</p>
+                </div>
+                <div className='row-span-2 col-span-1  border rounded-2xl'>
+                    <p>最高分数</p>
+                    <p>{gameInfo?.historyTopSource}</p>
                 </div>
 
+                <div className='row-span-1 col-span-1 border rounded-2xl' onClick={()=>resetGame()}>重新开始</div>
+                <div className='row-span-1 col-span-1 border rounded-2xl'>返回菜单</div>
             </div>
-
-            {/*<h1>2048</h1>*/}
-            {/*<div className="w-96 h-96 bg-amber-100 flex flex-wrap">*/}
-            {/*    <FloatCell></FloatCell>*/}
-            {/*</div>*/}
-            {/*<KeyBoard></KeyBoard>*/}
+            <h1>2048</h1>
+            <div className="w-96 h-96 bg-amber-100 flex flex-wrap">
+                <FloatCell></FloatCell>
+            </div>
+            <KeyBoard></KeyBoard>
         </main>
     )
 }
