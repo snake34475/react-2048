@@ -89,8 +89,8 @@ export default function Home() {
             _arrAll = xyTransforYx(_arrAll)
             _arrAll = _arrAll.map(arr => arr.reverse())
             _arrAll = MoveAndMerge(_arrAll)
-            _arrAll = _arrAll.map(arr => arr.reverse())
             _arrAll = MathAdd(_arrAll)
+            _arrAll = _arrAll.map(arr => arr.reverse())
             _arrAll = xyTransforYx(_arrAll)
             setArrAll(_arrAll)
         }
