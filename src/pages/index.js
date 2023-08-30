@@ -11,14 +11,14 @@ const initArrAll = [
     [0, 0, 0, 0],
     [0, 0, 0, 0]
 ]
-const initGameInfo={
-    source:0,
-    historyTopSource:0,
+const initGameInfo = {
+    source: 0,
+    historyTopSource: 0,
 }
 export default function Home() {
 
     const [arrAll, setArrAll] = useState(_.cloneDeep(initArrAll))
-    const [gameInfo,setGameInfo] = useState(initGameInfo)
+    const [gameInfo, setGameInfo] = useState(initGameInfo)
     useEffect(() => {
         // console.log("arrAll", arrAll)
         window.addEventListener("keydown", handleKeyDown)
@@ -33,14 +33,14 @@ export default function Home() {
         // const vConsole = new VConsole();
     }, [])
 
-    const initGameInfoFn=()=>{
+    const initGameInfoFn = () => {
         setGameInfo({
-            source:0,
-            historyTopSource:localStorage.getItem("historyTopSource")||0,
+            source: 0,
+            historyTopSource: localStorage.getItem("historyTopSource") || 0,
         })
     }
     //重新开始
-    const resetGame=()=>{
+    const resetGame = () => {
         initGameInfoFn()
         setArrAll(initArrAll)
         initArr(initArrAll)
@@ -97,7 +97,7 @@ export default function Home() {
     }
 
     //初始化两个坐标,随机生成两个
-    const initArr = (arr=arrAll) => {
+    const initArr = (arr = arrAll) => {
         const x1 = Math.floor(Math.random() * 4)
         const y1 = Math.floor(Math.random() * 4)
         const x2 = Math.floor(Math.random() * 4)
@@ -113,28 +113,16 @@ export default function Home() {
         return arrAll.map((arr, index) => {
             let _arr = arr.filter(item => item !== 0)
             //合并
-            for (let i = 0; i < _arr.length; i++) {
+            for (let i = 0; i < _arr.length-1; i++) {
                 if (_arr[i] === _arr[i + 1]) {
                     _arr[i] = _arr[i] * 2
                     _arr[i + 1] = 0
                     //更新分数和最大值
-                    const source = gameInfo.source+_arr[i]
-                    const historyTopSource=gameInfo.historyTopSource
-                    if(source<=historyTopSource){
-                        setGameInfo({
-                            ...gameInfo,
-                            source,
-                        })
-                    }else{
-                        setGameInfo({
-                            ...gameInfo,
-                            source,
-                            historyTopSource: source
-                        })
-                    }
-                    localStorage.setItem("historyTopSource",source)
+                    updataSource(_arr[i])
                 }
             }
+
+            //移动
             _arr = _arr.filter(item => item !== 0)
             const lg = arr.length - _arr.length
             if (lg > 0) {
@@ -170,16 +158,36 @@ export default function Home() {
         // _arr=_arr[index][3]
         return _arr
     }
+
+
+    //更新分支函数
+    const updataSource = (val) => {
+        //更新分数和最大值
+        const source = gameInfo.source + val
+        const historyTopSource = gameInfo.historyTopSource
+        if (source <= historyTopSource) {
+            setGameInfo({
+                ...gameInfo,
+                source,
+            })
+        } else {
+            setGameInfo({
+                ...gameInfo,
+                source,
+                historyTopSource: source
+            })
+        }
+        localStorage.setItem("historyTopSource", source)
+    }
     //基础生成
     const Cell = (props) => {
 
         return <div
             style={{backgroundColor: colorDir[props.val]}}
             className='w-24 h-24  text-center bg-amber-700 border-2 rounded-2xl flex items-center justify-center'>
-            <p>{props.val || 0}</p>
+            <p className='text-white text-3xl'>{props.val || 0}</p>
         </div>
     }
-
     const FloatCell = () => {
         return <>
             {arrAll.map((item, index) => {
@@ -199,26 +207,26 @@ export default function Home() {
         </div>
     }
     return (
-        <main className='text-center'>
+        <main className='text-center bg-orange-200 text-white h-full w-full'>
             <div className='grid grid-row-3 grid-cols-3 gap-4'>
-                <div className='row-span-3 grid-cols-1 border rounded-2xl'>
-                    <h2>2048</h2>
-                    <h3>4*4</h3>
+                <div className='row-span-3 grid-cols-1 rounded bg-amber-400'>
+                    <p className='text-4xl'>2048</p>
+                    <p className='text-3xl'>4*4</p>
                 </div>
-                <div className='row-span-2 col-span-1  border rounded-2xl'>
+                <div className='row-span-2 col-span-1 bg-neutral-500   rounded'>
                     <p>分数</p>
                     <p>{gameInfo?.source}</p>
                 </div>
-                <div className='row-span-2 col-span-1  border rounded-2xl'>
+                <div className='row-span-2 col-span-1 bg-neutral-500   rounded'>
                     <p>最高分数</p>
                     <p>{gameInfo?.historyTopSource}</p>
                 </div>
 
-                <div className='row-span-1 col-span-1 border rounded-2xl' onClick={()=>resetGame()}>重新开始</div>
-                <div className='row-span-1 col-span-1 border rounded-2xl'>返回菜单</div>
+                <div className='row-span-1 col-span-1 bg-amber-500  rounded' onClick={() => resetGame()}>重新开始</div>
+                <div className='row-span-1 col-span-1 bg-amber-500 rounded'>返回菜单</div>
             </div>
-            <h1>2048</h1>
-            <div className="w-96 h-96 bg-amber-100 flex flex-wrap">
+            <h1  className='text-4xl'>2048</h1>
+            <div className="w-96 h-96 bg-amber-100 flex flex-wrap m-auto">
                 <FloatCell></FloatCell>
             </div>
             <KeyBoard></KeyBoard>
