@@ -1,8 +1,9 @@
 import {Inter} from 'next/font/google'
 import {useEffect, useState} from "react"
-// import VConsole from 'vconsole';
+
 const inter = Inter({subsets: ['latin']})
 import * as _ from 'lodash'
+import {colorDir} from "@/utils";
 
 const initArrAll = [
     [0, 0, 0, 0],
@@ -38,8 +39,8 @@ export default function Home() {
             //移动
             _arrAll = MoveAndMerge(_arrAll)
             //新增一个
-            _arrAll=MathAdd(_arrAll)
-            console.log("_arrAll",_arrAll)
+            _arrAll = MathAdd(_arrAll)
+            console.log("_arrAll", _arrAll)
             //翻转回正常
             _arrAll = _arrAll.map(arr => arr.reverse())
             setArrAll(_arrAll)
@@ -50,29 +51,29 @@ export default function Home() {
             let _arrAll = _.cloneDeep(arrAll)
 
             _arrAll = MoveAndMerge(_arrAll)
-            _arrAll=MathAdd(_arrAll)
+            _arrAll = MathAdd(_arrAll)
             setArrAll(_arrAll)
         }
         //上边
         if (e.key === 'ArrowUp') {
             console.log("上边")
             let _arrAll = _.cloneDeep(arrAll)
-            _arrAll=xyTransforYx(_arrAll)
-            _arrAll=MoveAndMerge(_arrAll)
-            _arrAll=MathAdd(_arrAll)
-            _arrAll=xyTransforYx(_arrAll)
+            _arrAll = xyTransforYx(_arrAll)
+            _arrAll = MoveAndMerge(_arrAll)
+            _arrAll = MathAdd(_arrAll)
+            _arrAll = xyTransforYx(_arrAll)
             setArrAll(_arrAll)
         }
         //下边
         if (e.key === 'ArrowDown') {
             console.log("下边")
             let _arrAll = _.cloneDeep(arrAll)
-            _arrAll=xyTransforYx(_arrAll)
+            _arrAll = xyTransforYx(_arrAll)
             _arrAll = _arrAll.map(arr => arr.reverse())
-            _arrAll=MoveAndMerge(_arrAll)
+            _arrAll = MoveAndMerge(_arrAll)
             _arrAll = _arrAll.map(arr => arr.reverse())
-            _arrAll=MathAdd(_arrAll)
-            _arrAll=xyTransforYx(_arrAll)
+            _arrAll = MathAdd(_arrAll)
+            _arrAll = xyTransforYx(_arrAll)
             setArrAll(_arrAll)
         }
     }
@@ -111,33 +112,35 @@ export default function Home() {
         })
     }
     //xy颠倒
-    const xyTransforYx=(arr)=>{
-        let _arr= [[],[],[],[]]
+    const xyTransforYx = (arr) => {
+        let _arr = [[], [], [], []]
         for (let x = 0; x < arr.length; x++) {
             for (let y = 0; y < arr[x].length; y++) {
-                _arr[x][y]=arr[y][x]
+                _arr[x][y] = arr[y][x]
             }
         }
         return _arr
     }
     //随机添加
     const MathAdd = (arr) => {
-        let _arr= arr
-        let endArr=_arr.map(item=>item[3])
-        let MathArr=[]
-        endArr.forEach((item,index)=>{
-            if(item===0){
+        let _arr = arr
+        let endArr = _arr.map(item => item[3])
+        let MathArr = []
+        endArr.forEach((item, index) => {
+            if (item === 0) {
                 MathArr.push(index)
             }
         })
-        let index=Math.floor(Math.random()*MathArr.length)
-        _arr[index][3]=2
+        let index = Math.floor(Math.random() * MathArr.length)
+        _arr[index][3] = 2
         // _arr=_arr[index][3]
         return _arr
     }
     //基础生成
     const Cell = (props) => {
+
         return <div
+            style={{backgroundColor: colorDir[props.val]}}
             className='w-24 h-24  text-center bg-amber-700 border-2 rounded-2xl flex items-center justify-center'>
             <p>{props.val || 0}</p>
         </div>
@@ -152,23 +155,41 @@ export default function Home() {
     }
     const KeyBoard = () => {
         return <div className='w-96 text-center'>
-
-            <button className='h-16 w-16 border' onClick={()=>handleKeyDown({key:'ArrowUp'})}>上</button>
+            <button className='h-16 w-16 border' onClick={() => handleKeyDown({key: 'ArrowUp'})}>上</button>
             <div>
-                <button className='h-16 w-16 border' onClick={()=>handleKeyDown({key:'ArrowLeft'})}>左</button>
-                <button className='h-16 w-16 border' onClick={()=>handleKeyDown({key:'ArrowDown'})}>下</button>
-                <button className='h-16 w-16 border' onClick={()=>handleKeyDown({key:'ArrowRight'})}>右</button>
+                <button className='h-16 w-16 border' onClick={() => handleKeyDown({key: 'ArrowLeft'})}>左</button>
+                <button className='h-16 w-16 border' onClick={() => handleKeyDown({key: 'ArrowDown'})}>下</button>
+                <button className='h-16 w-16 border' onClick={() => handleKeyDown({key: 'ArrowRight'})}>右</button>
             </div>
 
         </div>
     }
     return (
-        <main>
-            {/*<h1>2048</h1>*/}
-            <div className="w-96 h-96 bg-amber-100 flex flex-wrap">
-                <FloatCell></FloatCell>
+        <main className='text-center'>
+            <div className='grid grid-row-2 grid-flow-col gap-4'>
+                <div className='basis-4/12 border rounded-2xl'>
+                    <h2>2048</h2>
+                    <h3>4*4</h3>
+                </div>
+                <div className='basis-6/12 grid grid-rows-2 '>
+                    <div className='grid grid-rows-2'>
+                        <div className='w-1/2 h-16 border rounded-2xl'>分数</div>
+                        <div className='w-1/2 h-16s border rounded-2xl'>最高分</div>
+                    </div>
+                    <div className='flex flex-row'>
+                        <div className='w-1/2 border rounded-2xl'>重新开始</div>
+                        <div className='w-1/2 border rounded-2xl'>返回菜单</div>
+                    </div>
+
+                </div>
+
             </div>
-            <KeyBoard></KeyBoard>
+
+            {/*<h1>2048</h1>*/}
+            {/*<div className="w-96 h-96 bg-amber-100 flex flex-wrap">*/}
+            {/*    <FloatCell></FloatCell>*/}
+            {/*</div>*/}
+            {/*<KeyBoard></KeyBoard>*/}
         </main>
     )
 }
